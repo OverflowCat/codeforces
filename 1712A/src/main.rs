@@ -13,7 +13,7 @@ fn do_a_case() {
     );
     let array = stdin.lock().lines().next().unwrap().unwrap();
     let array = array.split(' ').collect::<Vec<&str>>();
-    let mut array = array
+    let array = array
         .iter()
         .map(|x| x.parse::<u32>().unwrap())
         .collect::<Vec<u32>>();
@@ -28,34 +28,36 @@ fn do_a_case() {
     }
     // println!("{:?}, {:?}", sorted_array, hashmap);
 
-    let mut swap_count: u32 = 0;
-    // 最小，则必是排好序的
-    for i in 0..n {
-        for j in 0..n - 1 - i {
-            if array[j] > array[j + 1] {
-                array.swap(j, j + 1);
-                swap_count += 1;
-                // println!("std {:?}", array);
-                // println!("arr {:?}, swap {}x", array, swap_count);
-                // println!("j is {}, j+1 is {}, k is {}", j, j + 1, k);
-                if j <= k {
-                    // 交换的数在前面
-                    let mut temp_hashmap = HashMap::new();
-                    for i in 0..k {
-                        let count = temp_hashmap.entry(array[i]).or_insert(0);
-                        *count += 1;
-                    }
-                    if temp_hashmap == hashmap {
-                        println!("{}", swap_count / 2);
-                        return;
-                    } else {
-                        // println!("temp hashmap {:?}", temp_hashmap);
-                    }
-                }
+    // 对于 array[0..k]，不在 hashmap 里的移出去（o times）；
+    // 对于 array[k..n]，在 hashmap 里的移进来（i times）。
+    // 则总共需要 swap 的次数为 max(i, o)。
+    let mut o: u32 = 0;
+    for x in array[0..k].iter() {
+        if !hashmap.contains_key(x) {
+            o += 1;
+        } else {
+            // 从 hashmap 中减 1
+            let count = hashmap.entry(*x).or_insert(0);
+            if *count == 0 {
+                panic!("count is 0");
+            }
+            *count -= 1;
+            if *count == 0 {
+                hashmap.remove(x);
             }
         }
     }
-    println!("0");
+
+    let mut i: u32 = 0; // 还需要移进的个数
+    for (_key, count) in hashmap.iter() {
+        // 看看 hashmap 中还有啥子
+        if *count <= 0 {
+            panic!("count is {} when checking items left in hashmap", count);
+        }
+        i += *count;
+    }
+
+    println!("{}", std::cmp::max(i, o));
     return;
 }
 
