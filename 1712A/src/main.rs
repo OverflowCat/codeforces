@@ -7,7 +7,7 @@ fn do_a_case() {
     let stdin = io::stdin();
     let line = stdin.lock().lines().next().unwrap().unwrap();
     let two_numbers = line.split(' ').collect::<Vec<&str>>();
-    let (n, k) = (
+    let (_n, k) = (
         two_numbers[0].parse::<usize>().unwrap(),
         two_numbers[1].parse::<usize>().unwrap(),
     );
